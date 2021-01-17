@@ -51,11 +51,13 @@ class U1 : Rocket() {
     }
 
     override fun launch(): Boolean {
-        return 0.05 * (weight/maxWeight) >= 0.5
+        val randomNumber = rand(0,8)
+        return (0.05 * (weight/maxWeight)) <= randomNumber
     }
 
     override fun land(): Boolean {
-        return 0.01 * (weight/maxWeight) >= 0.01
+        val randomNumber = rand(0,16)
+        return (0.01 * (weight/maxWeight)) <= randomNumber
     }
 }
 
@@ -66,11 +68,13 @@ class U2 : Rocket() {
     }
 
     override fun launch(): Boolean {
-        return 0.04 * (weight/maxWeight) >= 0.4
+        val randomNumber = rand(0,8)
+        return (0.04 * (weight/maxWeight)) <= randomNumber
     }
 
     override fun land(): Boolean {
-        return 0.08 * (weight/maxWeight) >= 0.08
+        val randomNumber = rand(0,16)
+        return (0.08 * (weight/maxWeight)) <= randomNumber
     }
 }
 
@@ -128,24 +132,53 @@ class Simulation{
         return listOfU2
     }
 
-    fun runSimulation(rocketsList: ArrayList<Rocket>){
+    fun runSimulation(rocketsList: ArrayList<Rocket>): Int{
+        var totalRockts = 0
+        for (aRocket in rocketsList){
+            var launchState = aRocket.launch()
+            var landState = aRocket.land()
+            totalRockts += 1
+            while (!launchState){
+                launchState = aRocket.launch()
+                totalRockts += 1
+            }
+            while (!landState){
+                landState = aRocket.land()
+                totalRockts += 1
+            }
+        }
+        return totalRockts
+    }
+}
 
+class MarsProject{
+    fun startProject(){
+        val simulation = Simulation()
+        val listOfItemsPhase1 = simulation.loadItems("D:\\Codigos\\Kotlin\\Space Challenge\\src\\phase-1.txt")
+        val listOfItemsPhase2 = simulation.loadItems("D:\\Codigos\\Kotlin\\Space Challenge\\src\\phase-2.txt")
+
+        val listOfU1sPhase1 = simulation.loadU1(listOfItemsPhase1)
+        val listOfU1sPhase2 = simulation.loadU1(listOfItemsPhase2)
+
+
+        val totalRocketsU1 = simulation.runSimulation(listOfU1sPhase1 as ArrayList<Rocket>) + simulation.runSimulation(listOfU1sPhase2 as ArrayList<Rocket>)
+
+        val listOfU2sPhase1 = simulation.loadU2(listOfItemsPhase1)
+        val listOfU2sPhase2 = simulation.loadU2(listOfItemsPhase2)
+
+        val totalRocketsU2 = simulation.runSimulation(listOfU2sPhase1 as ArrayList<Rocket>) + simulation
+            .runSimulation(listOfU2sPhase2 as ArrayList<Rocket>)
+
+        println("--------------------------------------")
+        println("We'll need $totalRocketsU1 U1 Rockets to complete successfully this mision.")
+        println("We'll need $totalRocketsU2 U2 Rockets to complete successfully this mision.")
+        println("--------------------------------------")
     }
 }
 
 fun main(){
-    println("--------------------------------------------------------")
-    val simulation = Simulation()
-    val listOfItems = simulation.loadItems("D:\\Codigos\\Kotlin\\Space Challenge\\src\\phase-1.txt")
-    val listOfU1s = simulation.loadU1(listOfItems)
-    val listOfU2s = simulation.loadU2(listOfItems)
+    var marsProject = MarsProject()
+    marsProject.startProject()
 
-    for(u1 in listOfU1s){
-        println(u1)
-    }
-
-    for(u2 in listOfU2s){
-        println(u2)
-    }
 
 }
